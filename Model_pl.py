@@ -321,8 +321,12 @@ class model(LightningModule):
             # lr = 3e-5 + self.hparams.lr * (0.1 ** (epoch / self.hparams.lr_decay))
             lr = 2e-7 + self.hparams.lr * (0.1 ** (epoch / self.hparams.lr_decay))
             self.current_lr = lr
+            if self.hparams.distance_mode == 'hyperbolic':
+                base_lr = 2e-7
+            else:
+                base_lr = 2e-5
             for param_group in optimizer.param_groups:
-                param_group['lr'] = param_group['lr'] * 0.5 + 2e-7
+                param_group['lr'] = param_group['lr'] * 0.5 + base_lr
             # print('lr', param_group['lr'])
 
             # for param_group in self.optim[1].param_groups:
