@@ -130,7 +130,10 @@ def hyp_dist_tmp(embeddings, formula, return_coord=True):
     # print((tmp >= -1).sum() / (N * N - N))
     if formula == 1:
         G[G >= -1] = -1  # log this
-        return torch.acosh(-G), (G[np.triu(np.ones((N, N)), 1) == 1] >= -1).sum() / (N-1)**2
+        try:
+            return torch.acosh(-G), (G[torch.from_numpy(np.triu(np.ones((N, N)), 1) == 1)] >= -1).sum() / (N-1)**2
+        except:
+            breakpoint()
     else:
         return -G - 1, (G[np.triu(np.ones((N, N)), 1) == 1] >= -1).sum() / (N-1)**2
 
@@ -159,9 +162,9 @@ def loss(D, embeddings, lr, scale, formula):  # loss(self, triple_ids, similarit
     # return torch.mean(total)
     N = D.shape[0]
     distances, num_one = hyp_dist_tmp(embeddings, formula)
-    distances = distances[np.triu(np.ones((N, N)), 1) == 1]
+    distances = distances[torch.from_numpy(np.triu(np.ones((N, N)), 1) == 1)]
     # distances = euc_dist(self.embeddings)
-    D_vec = D[np.triu(np.ones((N, N)), 1) == 1]
+    D_vec = D[torch.from_numpy(np.triu(np.ones((N, N)), 1) == 1)]
     # D_vec = torch.tensor(D_vec)
     if formula == 2:
         D_vec = torch.cosh(D_vec * 1 / scale) - 1
